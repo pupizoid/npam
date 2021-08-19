@@ -5,9 +5,8 @@ mono: none
 dotnet: 3.1
 before_install:
 - sudo apt-get -y install libpam0g-dev
+- ./test/setup_test_account.sh
 install:
 - dotnet restore
 script:
-- dotnet build -c Release
-after_script:
-- ./test/setup_test_account.sh && dotnet test test/Npam.Tests/Npam.Tests.csproj -v d
+- dotnet test
