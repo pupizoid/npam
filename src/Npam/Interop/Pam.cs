@@ -12,5 +12,7 @@ namespace Npam.Interop
         public static extern PamStatus pam_acct_mgmt(IntPtr pamHandle, int flags);
         [DllImport("libpam")]
         public static extern PamStatus pam_end(IntPtr pamHandle, PamStatus pamStatus);
+        [DllImport("libpam")]
+        public static extern PamStatus pam_chauthtok(IntPtr pamHandle, int flags);
     }
 }

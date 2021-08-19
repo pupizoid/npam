@@ -55,5 +55,19 @@ namespace Npam.Test
             Thread.Sleep(2000);
             Assert.Equal(TotalAuthCalls, complete);
         }
+
+        [Fact]
+        public void TestChangePassword()
+        {
+            Assert.True(NpamUser.Authenticate(NpamTestsCommon.TestService, NpamTestsCommon.TestUsernameGood,
+                NpamTestsCommon.TestPassword));
+            Assert.Null(Record.Exception(() =>
+            {
+                NpamUser.ChangePassword(NpamTestsCommon.TestService, NpamTestsCommon.TestUsernameGood,
+                    NpamTestsCommon.TestNewPassword); 
+            }));
+            Assert.True(NpamUser.Authenticate(NpamTestsCommon.TestService, NpamTestsCommon.TestUsernameGood,
+                NpamTestsCommon.TestNewPassword));
+        }
     }
 }

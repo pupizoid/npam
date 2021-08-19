@@ -8,6 +8,7 @@ namespace Npam
     { 
         private const int AuthenticateFlags = 0;
         private const int AccountManagementFlags = 0;
+        private const int ChangeAuthTokenFlags = 0;
 
         public static bool Authenticate(string serviceName, string user, string password) {
             //Initialize
@@ -44,6 +45,31 @@ namespace Npam
             StdLibC.getgrouplist(user, info.GroupID, groupIdArray, ref numGroups);
             foreach (var groupId in groupIdArray)
                 yield return StdLibC.GetGrGidAsGroup(groupId);
+        }
+
+        public static void ChangePassword(string serviceName, string user, string password)
+        {
+            PamStatus lastReturnedValue = PamStatus.PAM_SUCCESS;
+            IntPtr pamHandle = IntPtr.Zero;
+            PamConv conversation = new PamConv();
+            ConversationHandler conversationHandler = new ConversationHandler(password);
+            conversation.ConversationCallback = conversationHandler.HandlePamConversation;
+
+            try
+            {
+                lastReturnedValue = Pam.pam_start(serviceName, user, conversation, ref pamHandle);
+                if (lastReturnedValue != PamStatus.PAM_SUCCESS) throw new InvalidOperationException($"pam_start failed with {lastReturnedValue}");
+                
+                lastReturnedValue = Pam.pam_chauthtok(pamHandle, ChangeAuthTokenFlags);
+                if (lastReturnedValue != PamStatus.PAM_SUCCESS) throw new InvalidOperationException($"pam_chauthtok failed with {lastReturnedValue}");
+                //Account Management - Checks that account is valid, checks account expiration, access restrictions.
+                lastReturnedValue = Pam.pam_acct_mgmt(pamHandle, AccountManagementFlags);
+                if (lastReturnedValue != PamStatus.PAM_SUCCESS) throw new InvalidOperationException($"pam_acct_mgmt failed with {lastReturnedValue}");
+            }
+            finally
+            {
+                Pam.pam_end(pamHandle, lastReturnedValue);
+            }
         }
 
         ///<summary>
