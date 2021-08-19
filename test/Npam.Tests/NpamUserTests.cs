@@ -59,8 +59,8 @@ namespace Npam.Test
         [Fact]
         public void TestChangePassword()
         {
-            Assert.True(NpamUser.Authenticate(NpamTestsCommon.TestService, NpamTestsCommon.TestUsernameGood,
-                NpamTestsCommon.TestPassword));
+            // Assert.True(NpamUser.Authenticate(NpamTestsCommon.TestService, NpamTestsCommon.TestUsernameGood,
+            //     NpamTestsCommon.TestPassword));
             Assert.Null(Record.Exception(() =>
             {
                 NpamUser.ChangePassword(NpamTestsCommon.TestService, NpamTestsCommon.TestUsernameGood,
