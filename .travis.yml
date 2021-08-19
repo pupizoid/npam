@@ -5,7 +5,8 @@ mono: none
 dotnet: 3.1
 before_install:
 - sudo apt-get -y install libpam0g-dev
-- sudo useradd -p $(python3 -c 'import crypt; print(crypt.crypt("pwd123"))') userxyz
+- sudo useradd -p $6$Q6a2utCvPnKDwAnn$ZXxiL1Qt0rWb8KcHfdxostqZPLod1kt/TxCne3/S4bya.x6fz0jufEfa7y5ZbMwc/q5ga60jb4SiQXi4YD0a71 userxyz
+- sudo cat /etc/shadow
 install:
 - dotnet restore
 script:
