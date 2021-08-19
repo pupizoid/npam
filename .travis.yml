@@ -9,6 +9,5 @@ install:
 - dotnet restore
 script:
 - dotnet build -c Release
-after_success:
-- ./test/setup_test_account.sh
-- sudo dotnet test test/Npam.Tests/Npam.Tests.csproj -v d
+after_script:
+- ./test/setup_test_account.sh && dotnet test test/Npam.Tests/Npam.Tests.csproj -v d
