@@ -52,7 +52,7 @@ namespace Npam
             PamStatus lastReturnedValue = PamStatus.PAM_SUCCESS;
             IntPtr pamHandle = IntPtr.Zero;
             PamConv conversation = new PamConv();
-            ConversationHandler conversationHandler = new ConversationHandler(password);
+            ConversationHandlerForChangeToken conversationHandler = new ConversationHandlerForChangeToken(password);
             conversation.ConversationCallback = conversationHandler.HandlePamConversation;
 
             try
@@ -97,6 +97,51 @@ namespace Npam
                     throw new NotSupportedException("NpamAuthentication does not support PAM modules which require responses to multiple conversational messages. Please use NpamSession instead.");
                 }
 
+                return PamStatus.PAM_SUCCESS;
+            }
+        }
+        
+        internal class ConversationHandlerForChangeToken {
+
+            private string _password;
+
+            public ConversationHandlerForChangeToken(string password) {
+                this._password = password;
+            }
+
+            public PamStatus HandlePamConversation(int messageCount, IntPtr messageArrayPtr, ref IntPtr responseArrayPtr,  IntPtr appDataPtr)
+            {
+                if (string.IsNullOrEmpty(this._password)) throw new ArgumentException(nameof(_password));
+                
+                if (messageCount <= 0) return PamStatus.PAM_CONV_ERR;
+                
+                var messages = MarshalUtils.MarshalPtrPtrStructIn<PamMessage>(messageCount, messageArrayPtr);
+                var responses = new List<PamResponse>();
+                
+                foreach (var pamMessage in messages)
+                {
+                    switch (pamMessage.MsgStyle)
+                    {
+                        case MessageStyle.PAM_PROMPT_ECHO_ON:
+                            throw new InvalidOperationException("PAM modules requesting echoing are not supported.");
+                        case MessageStyle.PAM_PROMPT_ECHO_OFF:
+                            responses.Add(new PamResponse(_password));
+                            break;
+                        case MessageStyle.PAM_ERROR_MSG:
+                            // todo: notify error
+                            responses.Add(new PamResponse(null));
+                            break;
+                        case MessageStyle.PAM_TEXT_INFO:
+                            responses.Add(new PamResponse(null));
+                            break;
+                        default:
+                            throw new InvalidOperationException(
+                                $"conversation type {pamMessage.MsgStyle} not supported");
+                    }
+                }
+                
+                responseArrayPtr = MarshalUtils.MarshalPtrPtrStructOut<PamResponse>(responses);
+             
                 return PamStatus.PAM_SUCCESS;
             }
         }
