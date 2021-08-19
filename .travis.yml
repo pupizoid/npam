@@ -11,4 +11,4 @@ script:
 - dotnet build -c Release
 after_success:
 - ./test/setup_test_account.sh
-- sudo dotnet test test/Npam.Tests/Npam.Tests.csproj
+- sudo dotnet test test/Npam.Tests/Npam.Tests.csproj -v normal
