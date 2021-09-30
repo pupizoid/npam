@@ -38,7 +38,7 @@ namespace Npam.Test
         [Fact]
         public void TestAuthForGoodUserThreaded() 
         {
-            const int TotalAuthCalls = 5000;
+            const int TotalAuthCalls = 2;
             Console.WriteLine("Running {0} threaded auth tests...", TotalAuthCalls);
             var complete = 0;
             Stopwatch sw = new Stopwatch();
